@@ -1,0 +1,72 @@
+//@version=2
+strategy("Long Short Strategy by Danhy989", shorttitle="Long_Short_Strategy_Danhy989", overlay=true)
+
+// This is an upgraded version of "X001TK MACD + Stochastic + RSI" Strategy. Raise profit rate to 67.56% with 1H short-term golden time frame with an alert.
+// 
+//
+// This strategy combines the special approach in stochastic and rsi
+// strategy to buy once stochastic and rsi closes above centerline "50" level 
+// with a MACD strategy to buy when the MACD value goes above the Signal line.
+//
+// === Long Strategy ===
+// This strategy goes long if the MACD goes above Signal and stochastic 
+// goes above 50 levels and rsi goes above 50 levels.
+// The simple that we will close the long position once RSI goes below 50 level
+
+// === Short Strategy ===
+// This strategy goes short if the MACD goes below Signal and stochastic 
+// goes below 50 levels and rsi goes below 50 levels.
+// The simple that we will close the short position once RSI goes above 50 level
+
+// This pure strategy does not have any
+// stop loss or take profit money management logic.
+//
+// Best profit with 1H Chart. But it is also usable on other time frames, you can Backtest.
+// 
+// Input
+fastMAlen = input(12, minval=1, title="MACD fast moving average")
+slowMAlen=input(26,minval=1, title="MACD slow moving average")
+signalMACDlen = input(9,minval=1, title="MACD signal line moving average")
+StochLength = input(14, minval=1, title="Stochastic Length")
+switch=input(true, title="Enable MACD Bar Color?")
+
+// MACD Calculation
+MACD = ema(close, fastMAlen) - ema(close, slowMAlen)
+signalMACD = ema(MACD, signalMACDlen)
+delta = MACD - signalMACD
+fastMA = ema(close,fastMAlen)
+slowMA = ema(close,slowMAlen)
+
+// Stochastic Calculation
+smoothK = input(3, title="Smoothing of Stochastic %K ")
+smoothD = input(3, title="Moving Average of Stochastic %K")
+k = sma(stoch(close, high, low, StochLength), smoothK)
+d = sma(k, smoothD)
+
+//RSI Calculation
+xRSI = rsi(close, 14)
+
+// Colors
+bartrendcolor = MACD > signalMACD and k > 50 and xRSI > 50? green : MACD < signalMACD and k < 50 and xRSI < 50? red : MACD < signalMACD? yellow : gray   
+barcolor(switch?bartrendcolor:na)
+
+//=== STRATEGY ===
+//conditions for long
+longCond = MACD > signalMACD and k > 50 and xRSI > 50
+closeLongCond = xRSI < 50
+strategy.entry("long", strategy.long,  when=longCond==true)
+strategy.close("long", when=closeLongCond==true)
+
+//conditions for short 
+shortCond = MACD < signalMACD and k < 50 and xRSI < 50
+closeShortCond = xRSI > 50
+strategy.entry("short", strategy.short,  when=shortCond==true)
+strategy.close("short", when=closeShortCond==true)
+// === /STRATEGY ===
+
+// === ALERT ===
+alertcondition(longCond==true, "Open Long", "Let's OPEN LONG position")
+alertcondition(closeLongCond==true, "Close Long", "Let's CLOSE LONG position")
+alertcondition(shortCond==true, "Open Short", "Let's OPEN SHORT position")
+alertcondition(closeShortCond==true, "Close Short", "Let's CLOSE SHORT position")
+// === /ALERT ===
