@@ -6,4 +6,5 @@
 ![image](https://user-images.githubusercontent.com/24559824/123744091-7278ff80-d8d8-11eb-98ea-e7afb58b81cc.png)
 ### 1 Hour chart
 ![image](https://user-images.githubusercontent.com/24559824/123745005-d2bc7100-d8d9-11eb-9750-d215f61247fd.png)
+![image](https://user-images.githubusercontent.com/24559824/123756115-cc80c180-d8e6-11eb-8de5-f4b71b7597de.png)
 
