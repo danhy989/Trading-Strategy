@@ -1,0 +1,98 @@
+//@version=4
+study("SSL Channel + Price Action + EMA by Danhy989", overlay=true)
+period=input(title="SSL_Channel_Period", defval=10)
+len=input(title="SSL_Channel_Period", defval=10)
+timeframe=input(title="SSL_Channel_TimeFrame", defval="60")
+ema=input(title="EMA",defval=50)
+tpLen=input(title="Take profit len",defval=100)
+slLen=input(title="Stop loss len",defval=50)
+refValue=input(title="Minimum of Candle Pattern",defval=30)
+
+isShowEntry=input(true,title="Show Entry?")
+isShowEma=input(true,title="Show EMA?")
+isShowSSLChannel=input(false,title="Show SSL Channel?")
+isTurnEngulfingPatt=input(true,title="Turn engulfing pattern?")
+isTurnPinBarPatt=input(false,title="Turn pin bar pattern?")
+
+// --- Init 
+smaHigh=sma(high, len)
+smaLow=sma(low, len)
+emaValue=ema(close,ema)
+
+// --- Get value from ssl_channel_timeframe
+outSmaHigh = security(syminfo.tickerid,timeframe,smaHigh)
+outSmaLow = security(syminfo.tickerid,timeframe,smaLow)
+outClose = security(syminfo.tickerid,timeframe,close)
+
+// --- Calv SSL Channel 
+Hlv = -1
+Hlv := outClose > outSmaHigh ? 1 : outClose < outSmaLow ? -1 : Hlv[1]
+
+sslDown = Hlv < 0 ? outSmaHigh: outSmaLow
+sslUp   = Hlv < 0 ? outSmaLow : outSmaHigh
+
+// --- Calv Long TP-SL 
+slValueLong = low[0]
+for i = 1 to slLen-1
+    if low[i] < slValueLong
+        slValueLong := low[i]
+
+tpValueLong = high[0]
+for i = 1 to tpLen-1
+    if high[i] > tpValueLong
+        tpValueLong := high[i]
+        
+        
+// --- Calv Short TP-SL
+slValueShort = high[0]
+for i = 1 to slLen-1
+    if high[i] > slValueShort
+        slValueShort := high[i]
+        
+tpValueShort = low[0]
+for i = 1 to tpLen-1
+    if low[i] < tpValueShort
+        tpValueShort := low[i]
+    
+
+// --- bullish engulfing
+bullishEngulfingPatt = (open[2]-close[2])>=refValue and low[3]>close[2] and open[1]<close[2] and close[1]>open[2]
+
+// --- bullish pin bar
+bullTail=min(open[2],close[2])-low[2]
+bullishPinBarPatt = bullTail>=refValue and open[3]>close[3] and close[1]>open[1] and low[2]<min(low[3],low[1]) and abs(open[2]-close[2])<bullTail
+
+// --- bearish engulfing
+bearishEngulfingPatt = (close[2]-open[2])>=refValue and high[3]<close[2] and open[1]>close[2] and close[1]<open[2]
+
+// --- bearish pin bar
+bearTail=high[1]-max(open[1],close[1])
+bearishPinBarPatt = bearTail>=refValue and close[3]>open[3] and open[1]>close[1] and high[2]>max(high[3],high[1]) and abs(open[2]-close[2])<bearTail
+
+
+// --- Condition LONG
+isOpenLong = high[1] < emaValue and sslUp > sslDown and ((bullishEngulfingPatt==true and isTurnEngulfingPatt==true) or (bullishPinBarPatt==true and isTurnPinBarPatt==true))
+
+// --- Condition SHORT
+isOpenShort = low[1] > emaValue and sslUp < sslDown and ((bearishEngulfingPatt==true and isTurnEngulfingPatt==true) or (bearishPinBarPatt==true and isTurnPinBarPatt==true))
+
+
+// --- Drawling
+if isOpenLong==true
+    text = "Long entry: "+tostring(close)+"\n\nStop loss: "+tostring(slValueLong)+"\n\nTake profit: "+tostring(tpValueLong)
+    line.new(x1=bar_index[slLen-1], y1=slValueLong, x2=bar_index, y2=slValueLong,style=line.style_solid,color=color.red)
+    line.new(x1=bar_index[tpLen-1], y1=tpValueLong, x2=bar_index, y2=tpValueLong,style=line.style_solid,color=color.blue)
+    if isShowEntry==true
+        label.new(bar_index[0],y=na,yloc=yloc.belowbar,style=label.style_label_up,color=color.green,textcolor=color.white,text=text)
+        
+if isOpenShort==true
+    text = "Short entry: "+tostring(close)+"\n\nStop loss: "+tostring(slValueShort)+"\n\nTake profit: "+tostring(tpValueShort)
+    line.new(x1=bar_index[slLen-1], y1=slValueShort, x2=bar_index, y2=slValueShort,style=line.style_solid,color=color.red)
+    line.new(x1=bar_index[tpLen-1], y1=tpValueShort, x2=bar_index, y2=tpValueShort,style=line.style_solid,color=color.blue)
+    if isShowEntry==true
+        label.new(bar_index[0],y=na,yloc=yloc.abovebar,style=label.style_label_down,color=color.red,textcolor=color.white,text=text)
+    
+plot(isShowSSLChannel ? sslDown : na, linewidth=2, color=color.red)
+plot(isShowSSLChannel ? sslUp : na, linewidth=2, color=color.lime)
+plot(isShowEma ? emaValue : na ,linewidth=2,color=color.purple)
+
