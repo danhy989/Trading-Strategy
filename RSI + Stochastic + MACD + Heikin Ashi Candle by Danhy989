@@ -3,6 +3,7 @@ strategy("Long Short Strategy by Danhy989", shorttitle="Long_Short_Strategy_Danh
 
 // This is an upgraded version of "X001TK MACD + Stochastic + RSI" Strategy. Raise profit rate to 67.56% with 1H short-term golden time frame with an alert.
 // 
+// Let use Heikin Ashi candle
 //
 // This strategy combines the special approach in stochastic and rsi
 // strategy to buy once stochastic and rsi closes above centerline "50" level 
