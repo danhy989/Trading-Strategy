@@ -1,6 +1,6 @@
 # Trading-Strategy
 
-# 1 ) The Long Short Strategy by Danhy989
+# 1 ) RSI + Stochastic + MACD + Heikin Ashi Candle by Danhy989
 ## Backtest
 ### 15 Min chart
 ![image](https://user-images.githubusercontent.com/24559824/123744091-7278ff80-d8d8-11eb-98ea-e7afb58b81cc.png)
@@ -12,3 +12,5 @@
 # 2) SSL Channel + Price Action + EMA by Danhy989
 ### 5 Min chart
 ![image](https://user-images.githubusercontent.com/24559824/125080995-b1d0f880-e0ef-11eb-9834-cb5dd107e210.png)
+### Engulfing Candle Pattern Manual test
+![image](https://user-images.githubusercontent.com/24559824/125162642-f2eff980-e13d-11eb-8650-018dbcc29b21.png)
