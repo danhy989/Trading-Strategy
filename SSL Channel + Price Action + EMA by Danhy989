@@ -96,3 +96,5 @@ plot(isShowSSLChannel ? sslDown : na, linewidth=2, color=color.red)
 plot(isShowSSLChannel ? sslUp : na, linewidth=2, color=color.lime)
 plot(isShowEma ? emaValue : na ,linewidth=2,color=color.purple)
 
+// alert condition
+alertcondition(condition=isOpenLong==true or isOpenShort==true,title="New position Alert",message="A new position has just been created.")
